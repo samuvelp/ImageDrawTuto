@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -25,12 +26,14 @@ import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button mLoadImageButton;
     private Button mSaveImageButton;
+    private Button mUndoButton;
     private ImageView mImageView;
     private Uri mSource;
     private Bitmap mBitmap;
@@ -39,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private static final float TOUCH_TOLERANCE = 4;
     private Paint mPaint;
     private Path mPath;
-    private LinkedList<Path> mPaths = new LinkedList<Path>();
+    private Bitmap tempBitmap;
+    private ArrayList<Path> mPaths = new ArrayList<>();
+    private ArrayList<Path> mUndonePaths = new ArrayList<>();
+
 
     final int REQ_IMAGE = 1;
 
@@ -53,11 +59,12 @@ public class MainActivity extends AppCompatActivity {
         }
         mLoadImageButton = (Button) findViewById(R.id.loadimageButton);
         mSaveImageButton = (Button) findViewById(R.id.saveimageButton);
+        mUndoButton = (Button) findViewById(R.id.undoButton);
         mImageView = (ImageView) findViewById(R.id.imageView);
 
         mPath = new Path();
         mCanvasMaster = new Canvas();
-        mPaths.add(mPath);
+        //mPaths.add(mPath);
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -83,7 +90,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        mUndoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mPaths.size()>0) {
+                    mPaths.remove(mPaths.size() - 1);
+                    mCanvasMaster.drawBitmap(tempBitmap,0,0,null);
+                    mPath.reset();
+                    drawOnProjectedBitMap();
+                    mImageView.invalidate();
+                }
 
+            }
+        });
         mImageView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -116,10 +135,10 @@ public class MainActivity extends AppCompatActivity {
         for(Path path : mPaths){
             mCanvasMaster.drawPath(path,mPaint);
         }
-
+            mCanvasMaster.drawPath(mPath,mPaint);
     }
     private void touch_start(ImageView iv, Bitmap bm,float x, float y) {
-        mPath.reset();
+       // mPath.reset();
         float ratioWidth=0;
         float ratioHeight=0;
         if (x < 0 || y < 0 || x > iv.getWidth() || y > iv.getHeight()) {
@@ -165,8 +184,8 @@ public class MainActivity extends AppCompatActivity {
         // commit the path to our offscreen
         mCanvasMaster.drawPath(mPath, mPaint);
         // kill this so we don't double draw
-        mPath = new Path();
         mPaths.add(mPath);
+        mPath = new Path();
         drawOnProjectedBitMap();
 
     }
@@ -175,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bitmap tempBitmap;
+
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {

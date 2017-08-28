@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ImageDrawTuto</string>
+    <string name="undo">Undo</string>
 </resources>
