@@ -2,6 +2,7 @@ package com.pandian.samuvel.imagedrawtuto;
 
 import android.Manifest;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -27,6 +30,7 @@ import android.widget.Toast;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,7 +54,18 @@ public class MainActivity extends AppCompatActivity {
     private Paint mPaint;
     private Path mPath;
     private Bitmap tempBitmap;
+    private int whiteColor;
+    private int redColor;
+    private int orangeColor;
+    private int yellowColor;
+    private int brownColor;
+    private int blueColor;
+    private int greenColor;
+    private int currentColor=-16777216 ;
+
     private ArrayList<Path> mPaths = new ArrayList<>();
+    private ArrayList<Paint> mPaintList = new ArrayList<>();
+    private HashMap<Path,Integer> colorMaps = new HashMap<>();
     final int REQ_IMAGE = 1;
 
     @Override
@@ -66,16 +81,30 @@ public class MainActivity extends AppCompatActivity {
         mUndoButton = (Button) findViewById(R.id.undoButton);
         mImageView = (ImageView) findViewById(R.id.imageView);
         mWhiteColorButton = (Button) findViewById(R.id.whiteColorButton);
+        mRedColorButton = (Button) findViewById(R.id.redColorButton);
+        mOrangeColorButton = (Button) findViewById(R.id.orangeColorButton);
+        mYellowColorButton = (Button) findViewById(R.id.yellowColorButton);
+        mBrownColorButton = (Button) findViewById(R.id.brownColorButton);
+        mBlueColorButton = (Button) findViewById(R.id.blueColorButton);
+        mGreenColorButton = (Button) findViewById(R.id.greenColorButton);
+        whiteColor = ContextCompat.getColor(getApplicationContext(),R.color.whiteColor);
+        redColor = ContextCompat.getColor(getApplicationContext(),R.color.redColor);
+        orangeColor = ContextCompat.getColor(getApplicationContext(),R.color.orangeColor);
+        yellowColor = ContextCompat.getColor(getApplicationContext(),R.color.yellowColor);
+        brownColor = ContextCompat.getColor(getApplicationContext(),R.color.brownColor);
+        blueColor = ContextCompat.getColor(getApplicationContext(),R.color.blueColor);
+        greenColor = ContextCompat.getColor(getApplicationContext(),R.color.greenColor);
 
-        mPath = new Path();
-        mCanvasMaster = new Canvas();
-        //mPaths.add(mPath);
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Color.RED);
-        mPaint.setStrokeJoin(Paint.Join.BEVEL);
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(10);
+        mPaintList.add(mPaint);
+        mPath = new Path();
+        mCanvasMaster = new Canvas();
 
         mLoadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                     mPaths.remove(mPaths.size() - 1);
                     mCanvasMaster.drawBitmap(tempBitmap,0,0,null);
                     mPath.reset();
-                    drawOnProjectedBitMap();
+                    drawOnProjectedBitMap(mPaint);
                     mImageView.invalidate();
                 }
 
@@ -111,7 +140,99 @@ public class MainActivity extends AppCompatActivity {
         mWhiteColorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mPaint.setColor(Color.WHITE);
+                Paint whitePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                whitePaint.setStyle(Paint.Style.STROKE);
+                whitePaint.setColor(whiteColor);
+                whitePaint.setStrokeJoin(Paint.Join.ROUND);
+                whitePaint.setStrokeCap(Paint.Cap.ROUND);
+                whitePaint.setStrokeWidth(10);
+                mPaintList.add(whitePaint);
+                currentColor = whiteColor;
+                drawOnProjectedBitMap(whitePaint);
+            }
+        });
+        mRedColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Paint redPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                redPaint.setStyle(Paint.Style.STROKE);
+                redPaint.setColor(redColor);
+                redPaint.setStrokeJoin(Paint.Join.ROUND);
+                redPaint.setStrokeCap(Paint.Cap.ROUND);
+                redPaint.setStrokeWidth(10);
+                mPaintList.add(redPaint);
+                currentColor = redColor;
+                 drawOnProjectedBitMap(redPaint);
+            }
+        });
+        mOrangeColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Paint orangePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                orangePaint.setStyle(Paint.Style.STROKE);
+                orangePaint.setColor(orangeColor);
+                orangePaint.setStrokeJoin(Paint.Join.ROUND);
+                orangePaint.setStrokeCap(Paint.Cap.ROUND);
+                orangePaint.setStrokeWidth(10);
+                mPaintList.add(orangePaint);
+                currentColor = orangeColor;
+                drawOnProjectedBitMap(orangePaint);
+            }
+        });
+        mYellowColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Paint yellowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                yellowPaint.setStyle(Paint.Style.STROKE);
+                yellowPaint.setColor(yellowColor);
+                yellowPaint.setStrokeJoin(Paint.Join.ROUND);
+                yellowPaint.setStrokeCap(Paint.Cap.ROUND);
+                yellowPaint.setStrokeWidth(10);
+                mPaintList.add(yellowPaint);
+                currentColor = yellowColor;
+                drawOnProjectedBitMap(yellowPaint);
+            }
+        });
+        mBrownColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Paint brownPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                brownPaint.setStyle(Paint.Style.STROKE);
+                brownPaint.setColor(brownColor);
+                brownPaint.setStrokeJoin(Paint.Join.ROUND);
+                brownPaint.setStrokeCap(Paint.Cap.ROUND);
+                brownPaint.setStrokeWidth(10);
+                mPaintList.add(brownPaint);
+                currentColor = brownColor;
+                drawOnProjectedBitMap(brownPaint);
+            }
+        });
+        mBlueColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Paint bluePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                bluePaint.setStyle(Paint.Style.STROKE);
+                bluePaint.setColor(blueColor);
+                bluePaint.setStrokeJoin(Paint.Join.ROUND);
+                bluePaint.setStrokeCap(Paint.Cap.ROUND);
+                bluePaint.setStrokeWidth(10);
+                mPaintList.add(bluePaint);
+                currentColor = blueColor;
+                drawOnProjectedBitMap(bluePaint);
+            }
+        });
+        mGreenColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Paint greenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                greenPaint.setStyle(Paint.Style.STROKE);
+                greenPaint.setColor(greenColor);
+                greenPaint.setStrokeJoin(Paint.Join.ROUND);
+                greenPaint.setStrokeCap(Paint.Cap.ROUND);
+                greenPaint.setStrokeWidth(10);
+                mPaintList.add(greenPaint);
+                currentColor = greenColor;
+                drawOnProjectedBitMap(greenPaint);
             }
         });
         mImageView.setOnTouchListener(new View.OnTouchListener() {
@@ -142,14 +263,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void drawOnProjectedBitMap() {
+    private void drawOnProjectedBitMap(Paint paint) {
         for(Path path : mPaths){
+            mPaint.setColor(colorMaps.get(path));
             mCanvasMaster.drawPath(path,mPaint);
         }
-            mCanvasMaster.drawPath(mPath,mPaint);
+            mCanvasMaster.drawPath(mPath,paint);
     }
     private void touch_start(ImageView iv, Bitmap bm,float x, float y) {
-       // mPath.reset();
+        mPath.reset();
         float ratioWidth=0;
         float ratioHeight=0;
         if (x < 0 || y < 0 || x > iv.getWidth() || y > iv.getHeight()) {
@@ -159,9 +281,11 @@ public class MainActivity extends AppCompatActivity {
         else {
             ratioWidth = (float) bm.getWidth() / (float) iv.getWidth();
             ratioHeight = (float) bm.getHeight() / (float) iv.getHeight();
-            mPaint.setStrokeWidth(ratioWidth*10);
+            Paint lastPaintObj = mPaintList.get(mPaintList.size()-1);
+            lastPaintObj.setStrokeWidth(ratioWidth*10);
             mPath.moveTo(x * ratioWidth, y * ratioHeight);
-            drawOnProjectedBitMap();
+            colorMaps.put(mPath,currentColor);
+            //drawOnProjectedBitMap(lastPaintObj);
         }
         mX = x * ratioWidth;
         mY = y * ratioHeight;
@@ -177,7 +301,8 @@ public class MainActivity extends AppCompatActivity {
         else {
             ratioWidth = (float) bm.getWidth() / (float) iv.getWidth();
             ratioHeight = (float) bm.getHeight() / (float) iv.getHeight();
-            mPaint.setStrokeWidth(ratioWidth*10);
+            Paint lastPaintObj = mPaintList.get(mPaintList.size()-1);
+            lastPaintObj.setStrokeWidth(ratioWidth*10);
             x = x*ratioWidth;
             y = y*ratioHeight;
             float dx = Math.abs(x - mX);
@@ -186,18 +311,21 @@ public class MainActivity extends AppCompatActivity {
                 mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
                 mX = x;
                 mY = y;
-                drawOnProjectedBitMap();
+                drawOnProjectedBitMap(lastPaintObj);
+
             }
         }
     }
     private void touch_up() {
         mPath.lineTo(mX, mY);
         // commit the path to our offscreen
-        mCanvasMaster.drawPath(mPath, mPaint);
+        Paint lastPaintObj = mPaintList.get(mPaintList.size()-1);
+        mCanvasMaster.drawPath(mPath, lastPaintObj);
         // kill this so we don't double draw
+       // drawOnProjectedBitMap(lastPaintObj);
         mPaths.add(mPath);
         mPath = new Path();
-        drawOnProjectedBitMap();
+
 
     }
 
