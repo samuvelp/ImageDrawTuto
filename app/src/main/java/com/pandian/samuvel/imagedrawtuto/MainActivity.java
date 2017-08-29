@@ -34,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
     private Button mLoadImageButton;
     private Button mSaveImageButton;
     private Button mUndoButton;
+    private Button mWhiteColorButton;
+    private Button mRedColorButton;
+    private Button mOrangeColorButton;
+    private Button mYellowColorButton;
+    private Button mBrownColorButton;
+    private Button mBlueColorButton;
+    private Button mGreenColorButton;
     private ImageView mImageView;
     private Uri mSource;
     private Bitmap mBitmap;
@@ -44,9 +51,6 @@ public class MainActivity extends AppCompatActivity {
     private Path mPath;
     private Bitmap tempBitmap;
     private ArrayList<Path> mPaths = new ArrayList<>();
-    private ArrayList<Path> mUndonePaths = new ArrayList<>();
-
-
     final int REQ_IMAGE = 1;
 
     @Override
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         mSaveImageButton = (Button) findViewById(R.id.saveimageButton);
         mUndoButton = (Button) findViewById(R.id.undoButton);
         mImageView = (ImageView) findViewById(R.id.imageView);
+        mWhiteColorButton = (Button) findViewById(R.id.whiteColorButton);
 
         mPath = new Path();
         mCanvasMaster = new Canvas();
@@ -101,6 +106,12 @@ public class MainActivity extends AppCompatActivity {
                     mImageView.invalidate();
                 }
 
+            }
+        });
+        mWhiteColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPaint.setColor(Color.WHITE);
             }
         });
         mImageView.setOnTouchListener(new View.OnTouchListener() {
