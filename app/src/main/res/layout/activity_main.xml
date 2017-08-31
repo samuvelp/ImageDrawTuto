@@ -1,105 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pandian.samuvel.imagedrawtuto.MainActivity"
-    android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/colorPalatte"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
+    android:orientation="vertical"
+    tools:context="com.pandian.samuvel.imagedrawtuto.MainActivity">
 
-        android:orientation="horizontal"
-        android:layout_gravity="center">
-         <Button
-            android:id="@+id/whiteColorButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-             android:onClick="onClick"
-            android:background="@drawable/round_button_white" />
-         <Button
-             android:id="@+id/redColorButton"
-             android:layout_width="30dp"
-             android:layout_height="30dp"
-             android:layout_gravity="center"
-             android:layout_margin="10dp"
-              android:background="@drawable/round_button_red"/>
-         <Button
-             android:id="@+id/orangeColorButton"
-             android:layout_width="30dp"
-             android:layout_height="30dp"
-             android:layout_gravity="center"
-             android:layout_margin="10dp"
-             android:background="@drawable/round_button_orange"/>
-         <Button
-             android:id="@+id/yellowColorButton"
-             android:layout_width="30dp"
-             android:layout_height="30dp"
-             android:layout_gravity="center"
-             android:layout_margin="10dp"
-             android:background="@drawable/round_button_yellow"/>
-         <Button
-             android:id="@+id/brownColorButton"
-             android:layout_width="30dp"
-             android:layout_height="30dp"
-             android:layout_gravity="center"
-             android:layout_margin="10dp"
-             android:background="@drawable/round_button_brown"/>
-         <Button
-             android:id="@+id/blueColorButton"
-             android:layout_width="30dp"
-             android:layout_height="30dp"
-             android:layout_gravity="center"
-             android:layout_margin="10dp"
-             android:background="@drawable/round_button_blue"/>
-         <Button
-             android:id="@+id/greenColorButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-             android:background="@drawable/round_button_green"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
     <Button
         android:id="@+id/loadimageButton"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="Load Image"
-        android:layout_alignParentBottom="true"
-         />
+        android:layout_height="wrap_content"
+        android:text="@string/loadimage" />
     <Button
-        android:id="@+id/undoButton"
+        android:id="@+id/saveImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/undo"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
-    <Button
-        android:id="@+id/saveimageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="Save Image"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"/>
-    </LinearLayout>
+        android:text="@string/saveimage"
+        android:layout_alignParentRight="true"/>
     <ImageView
-        android:id="@+id/imageView"
-        android:scaleType="centerInside"
-        android:adjustViewBounds="true"
+        android:id="@+id/resultImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         />
-</LinearLayout>
+
+</RelativeLayout>

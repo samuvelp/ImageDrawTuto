@@ -3,4 +3,6 @@
     <string name="undo">Undo</string>
     <string name="loadimage">Load Image</string>
     <string name="saveimage">Save Image</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>
