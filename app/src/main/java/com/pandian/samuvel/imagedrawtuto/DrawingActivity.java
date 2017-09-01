@@ -50,6 +50,7 @@ public class DrawingActivity extends AppCompatActivity {
     private Button mBlueColorButton;
     private Button mGreenColorButton;
     private Button mCancelButton;
+    private Button mCropButton;
     private ImageView mImageView;
     private Uri mSource;
     private Bitmap mBitmap;
@@ -95,6 +96,7 @@ public class DrawingActivity extends AppCompatActivity {
         mBlueColorButton = (Button) findViewById(R.id.blueColorButton);
         mGreenColorButton = (Button) findViewById(R.id.greenColorButton);
         mCancelButton = (Button) findViewById(R.id.cancelButton);
+        mCropButton = (Button) findViewById(R.id.cropButton);
         mColorIndicator = (LinearLayout) findViewById(R.id.colorIndicator);
 
         whiteColor = ContextCompat.getColor(getApplicationContext(),R.color.whiteColor);
@@ -112,17 +114,21 @@ public class DrawingActivity extends AppCompatActivity {
 
 
         startDefaultPaint();
-        openBitmapReduced();
-
+        try {
+            openBitmapReduced();
+        }catch (NullPointerException e){}
+        try{
+            loadImage();
+        }catch (NullPointerException e){}
         mOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mBitmap != null) {
-                    //saveBitmap(mBitmap);
                     convertBitmapToByte(mBitmap);
                 }
             }
         });
+
         mUndoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,6 +140,19 @@ public class DrawingActivity extends AppCompatActivity {
                     mImageView.invalidate();
                 }
 
+            }
+        });
+        mCropButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mBitmap != null) {
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                    byte[] imageBytesCrop = byteArrayOutputStream.toByteArray();
+                    Intent intent = new Intent(DrawingActivity.this, CropActivity.class);
+                    intent.putExtra("imageBytesCrop", imageBytesCrop);
+                    startActivity(intent);
+                }
             }
         });
         mCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -394,7 +413,27 @@ public class DrawingActivity extends AppCompatActivity {
         }
     }
 
+    private void loadImage(){
+        Bundle bundle = getIntent().getExtras();
+        byte[] imageBytes = bundle.getByteArray("imageBytesCropped");
+        tempBitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+        Bitmap.Config config;
+        if (tempBitmap.getConfig() != null) {
+            config = tempBitmap.getConfig();
+        } else {
+            config = Bitmap.Config.ARGB_8888;
+        }
 
+        //mBitmap is Mutable bitmap
+        mBitmap = Bitmap.createBitmap(
+                tempBitmap.getWidth(),
+                tempBitmap.getHeight(),
+                config);
+
+        mCanvasMaster = new Canvas(mBitmap);
+        mCanvasMaster.drawBitmap(tempBitmap, 0, 0, null);
+        mImageView.setImageBitmap(mBitmap);
+    }
     private void convertBitmapToByte(Bitmap bm) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG, 100,outputStream);

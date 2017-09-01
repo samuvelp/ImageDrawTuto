@@ -93,17 +93,18 @@
         android:id="@+id/undoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/undo"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:text="@string/undo" />
+    <Button
+        android:id="@+id/cropButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crop" />
     <Button
         android:id="@+id/okButton"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="@string/ok"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"/>
+        android:layout_height="wrap_content"
+        android:text="@string/ok" />
+
     </LinearLayout>
     <ImageView
         android:id="@+id/imageView"
