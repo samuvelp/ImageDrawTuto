@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
@@ -60,6 +61,7 @@ public class DrawingActivity extends AppCompatActivity {
     private Paint mPaint;
     private Path mPath;
     private Bitmap tempBitmap;
+    private Bitmap tempBitmapOriginal;
     private LinearLayout mColorIndicator;
     private GradientDrawable gradientDrawable;
     private int whiteColor;
@@ -373,7 +375,7 @@ public class DrawingActivity extends AppCompatActivity {
         mPaintList.add(mPaint);
     }
 
-    private void openBitmapReduced(){
+ /*   private void openBitmapReduced(){
         Bundle bundle =getIntent().getExtras();
         mSource = (Uri) bundle.get("imageUri");
         try {
@@ -412,6 +414,52 @@ public class DrawingActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+*/
+    private void openBitmapReduced(){
+        Bundle bundle =getIntent().getExtras();
+        mSource = (Uri) bundle.get("imageUri");
+        try {
+            //tempBitmap is Immutable bitmap,
+            //cannot be passed to Canvas constructor
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            tempBitmap = BitmapFactory.decodeStream(
+                    getContentResolver().openInputStream(mSource),null,options);
+            if(options.outHeight>2560 || options.outWidth>1440) {
+                options.inSampleSize = 4;
+            }
+            else options.inSampleSize = 1;
+            options.inJustDecodeBounds = false;
+
+            tempBitmap = BitmapFactory.decodeStream(
+                    getContentResolver().openInputStream(mSource),null,options);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            tempBitmap.compress(Bitmap.CompressFormat.JPEG,15,byteArrayOutputStream);
+            tempBitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+
+            Bitmap.Config config;
+            if (tempBitmap.getConfig() != null) {
+                config = tempBitmap.getConfig();
+            } else {
+                config = Bitmap.Config.ARGB_8888;
+            }
+
+            //mBitmap is Mutable bitmap
+            mBitmap = Bitmap.createBitmap(
+                    tempBitmap.getWidth(),
+                    tempBitmap.getHeight(),
+                    config);
+
+            mCanvasMaster = new Canvas(mBitmap);
+            mCanvasMaster.drawBitmap(tempBitmap, 0, 0, null);
+
+            mImageView.setImageBitmap(mBitmap);
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
 
     private void loadImage(){
         Bundle bundle = getIntent().getExtras();
@@ -443,7 +491,7 @@ public class DrawingActivity extends AppCompatActivity {
         intent.putExtra("imageBytes",bytes);
         startActivity(intent);
     }
-    public static int calculateInSampleSize(
+    public static int calculateInSampleSize( //algorithm recommended by official documentation to calculate InSampleSize, use if needed
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;

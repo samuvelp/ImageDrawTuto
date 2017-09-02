@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 public class CropActivity extends AppCompatActivity {
@@ -42,8 +43,11 @@ public class CropActivity extends AppCompatActivity {
     private void loadImage(){
         Bundle bundle = getIntent().getExtras();
         byte[] imageBytes = bundle.getByteArray("imageBytesCrop");
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         mBitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
 
+        mBitmap.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream);
+        mBitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
         mCropImageView.setImageBitmap(mBitmap);//setting image to cropping image view
     }
     private void sendCroppedImage(){
