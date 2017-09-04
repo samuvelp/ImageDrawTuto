@@ -53,7 +53,7 @@ public class CropActivity extends AppCompatActivity {
     private void sendCroppedImage(){
         mBitmap = mCropImageView.getCroppedImage();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         Intent intent = new Intent(CropActivity.this,DrawingActivity.class);
         intent.putExtra("imageBytesCropped", imageBytes);

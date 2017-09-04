@@ -1,7 +1,6 @@
 package com.pandian.samuvel.imagedrawtuto;
 
-import android.app.Activity;
-import android.content.ContentValues;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,37 +9,29 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DrawingActivity extends AppCompatActivity {
 
-    private Button mLoadImageButton;
+
     private Button mOkButton;
     private Button mUndoButton;
     private Button mWhiteColorButton;
@@ -55,13 +46,13 @@ public class DrawingActivity extends AppCompatActivity {
     private ImageView mImageView;
     private Uri mSource;
     private Bitmap mBitmap;
+    private Bitmap mInitialImage;
     private Canvas mCanvasMaster;
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
     private Paint mPaint;
     private Path mPath;
     private Bitmap tempBitmap;
-    private Bitmap tempBitmapOriginal;
     private LinearLayout mColorIndicator;
     private GradientDrawable gradientDrawable;
     private int whiteColor;
@@ -86,7 +77,7 @@ public class DrawingActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
-        mLoadImageButton = (Button) findViewById(R.id.loadimageButton);
+
         mOkButton = (Button) findViewById(R.id.okButton);
         mUndoButton = (Button) findViewById(R.id.undoButton);
         mImageView = (ImageView) findViewById(R.id.imageView);
@@ -116,12 +107,14 @@ public class DrawingActivity extends AppCompatActivity {
 
 
         startDefaultPaint();
+
+        try{
+            loadCroppedImage();
+        }catch (NullPointerException e){}
         try {
             openBitmapReduced();
         }catch (NullPointerException e){}
-        try{
-            loadImage();
-        }catch (NullPointerException e){}
+
         mOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,6 +127,7 @@ public class DrawingActivity extends AppCompatActivity {
         mUndoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if(mPaths.size()>0) {
                     mPaths.remove(mPaths.size() - 1);
                     mCanvasMaster.drawBitmap(tempBitmap,0,0,null);
@@ -148,6 +142,7 @@ public class DrawingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(mBitmap != null) {
+
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                     byte[] imageBytesCrop = byteArrayOutputStream.toByteArray();
@@ -166,6 +161,7 @@ public class DrawingActivity extends AppCompatActivity {
         mWhiteColorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Paint whitePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 whitePaint.setStyle(Paint.Style.STROKE);
                 whitePaint.setColor(whiteColor);
@@ -452,7 +448,7 @@ public class DrawingActivity extends AppCompatActivity {
 
             mCanvasMaster = new Canvas(mBitmap);
             mCanvasMaster.drawBitmap(tempBitmap, 0, 0, null);
-
+            mInitialImage = mBitmap;
             mImageView.setImageBitmap(mBitmap);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
@@ -460,8 +456,8 @@ public class DrawingActivity extends AppCompatActivity {
         }
     }
 
+    private void loadCroppedImage(){
 
-    private void loadImage(){
         Bundle bundle = getIntent().getExtras();
         byte[] imageBytes = bundle.getByteArray("imageBytesCropped");
         tempBitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
