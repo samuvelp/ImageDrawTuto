@@ -64,7 +64,7 @@ public class DrawingActivity extends AppCompatActivity {
     private int greenColor;
     private int currentColor=-65536;//red color int value
 
-    private ArrayList<Path> mPaths = new ArrayList<>();
+    private ArrayList<Path> mPathList = new ArrayList<>();
     private ArrayList<Paint> mPaintList = new ArrayList<>();
     private HashMap<Path,Integer> colorMaps = new HashMap<>();
     final int REQ_IMAGE = 1;
@@ -104,8 +104,6 @@ public class DrawingActivity extends AppCompatActivity {
         mPath = new Path();
         mCanvasMaster = new Canvas();
 
-
-
         startDefaultPaint();
 
         try{
@@ -128,11 +126,11 @@ public class DrawingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(mPaths.size()>0) {
-                    mPaths.remove(mPaths.size() - 1);
+                if(mPathList.size()>0) {
+                    mPathList.remove(mPathList.size() - 1);
                     mCanvasMaster.drawBitmap(tempBitmap,0,0,null);
                     mPath.reset();
-                    drawOnProjectedBitMap(mPaint);
+                    drawOnProjectedBitMap();
                     mImageView.invalidate();
                 }
 
@@ -142,12 +140,11 @@ public class DrawingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(mBitmap != null) {
-
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
                     byte[] imageBytesCrop = byteArrayOutputStream.toByteArray();
                     Intent intent = new Intent(DrawingActivity.this, CropActivity.class);
-                    intent.putExtra("imageBytesCrop", imageBytesCrop);
+                   // intent.putExtra("imageBytesCrop", imageBytesCrop);
                     startActivity(intent);
                 }
             }
@@ -170,7 +167,7 @@ public class DrawingActivity extends AppCompatActivity {
                 whitePaint.setStrokeWidth(10);
                 mPaintList.add(whitePaint);
                 currentColor = whiteColor;
-                drawOnProjectedBitMap(whitePaint);
+                drawOnProjectedBitMap();
 
                 gradientDrawable.setColor(whiteColor);
 
@@ -187,7 +184,7 @@ public class DrawingActivity extends AppCompatActivity {
                 redPaint.setStrokeWidth(10);
                 mPaintList.add(redPaint);
                 currentColor = redColor;
-                 drawOnProjectedBitMap(redPaint);
+                 drawOnProjectedBitMap();
                 gradientDrawable.setColor(redColor);
             }
         });
@@ -202,7 +199,7 @@ public class DrawingActivity extends AppCompatActivity {
                 orangePaint.setStrokeWidth(10);
                 mPaintList.add(orangePaint);
                 currentColor = orangeColor;
-                drawOnProjectedBitMap(orangePaint);
+                drawOnProjectedBitMap();
                 gradientDrawable.setColor(orangeColor);
             }
         });
@@ -217,7 +214,7 @@ public class DrawingActivity extends AppCompatActivity {
                 yellowPaint.setStrokeWidth(10);
                 mPaintList.add(yellowPaint);
                 currentColor = yellowColor;
-                drawOnProjectedBitMap(yellowPaint);
+                drawOnProjectedBitMap();
                 gradientDrawable.setColor(yellowColor);
             }
         });
@@ -232,7 +229,7 @@ public class DrawingActivity extends AppCompatActivity {
                 brownPaint.setStrokeWidth(10);
                 mPaintList.add(brownPaint);
                 currentColor = brownColor;
-                drawOnProjectedBitMap(brownPaint);
+                drawOnProjectedBitMap();
                 gradientDrawable.setColor(brownColor);
             }
         });
@@ -247,7 +244,7 @@ public class DrawingActivity extends AppCompatActivity {
                 bluePaint.setStrokeWidth(10);
                 mPaintList.add(bluePaint);
                 currentColor = blueColor;
-                drawOnProjectedBitMap(bluePaint);
+                drawOnProjectedBitMap();
                 gradientDrawable.setColor(blueColor);
             }
         });
@@ -262,7 +259,7 @@ public class DrawingActivity extends AppCompatActivity {
                 greenPaint.setStrokeWidth(10);
                 mPaintList.add(greenPaint);
                 currentColor = greenColor;
-                drawOnProjectedBitMap(greenPaint);
+                drawOnProjectedBitMap();
                 gradientDrawable.setColor(greenColor);
             }
         });
@@ -294,15 +291,16 @@ public class DrawingActivity extends AppCompatActivity {
 
     }
 
-    private void drawOnProjectedBitMap(Paint paint) {
-        for(Path path : mPaths){
+    private void drawOnProjectedBitMap() {
+        for(Path path : mPathList){
             mPaint.setColor(colorMaps.get(path));
             mCanvasMaster.drawPath(path,mPaint);
         }
+            Paint paint = mPaintList.get(mPaintList.size()-1);
             mCanvasMaster.drawPath(mPath,paint);
     }
     private void touch_start(ImageView iv, Bitmap bm,float x, float y) {
-        mPath.reset();
+        //mPath.reset();
         float ratioWidth=0;
         float ratioHeight=0;
         if (x < 0 || y < 0 || x > iv.getWidth() || y > iv.getHeight()) {
@@ -342,7 +340,7 @@ public class DrawingActivity extends AppCompatActivity {
                 mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
                 mX = x;
                 mY = y;
-                drawOnProjectedBitMap(lastPaintObj);
+                drawOnProjectedBitMap();
 
             }
         }
@@ -354,10 +352,8 @@ public class DrawingActivity extends AppCompatActivity {
         mCanvasMaster.drawPath(mPath, lastPaintObj);
         // kill this so we don't double draw
        // drawOnProjectedBitMap(lastPaintObj);
-        mPaths.add(mPath);
+        mPathList.add(mPath);
         mPath = new Path();
-
-
     }
 
 
@@ -371,46 +367,7 @@ public class DrawingActivity extends AppCompatActivity {
         mPaintList.add(mPaint);
     }
 
- /*   private void openBitmapReduced(){
-        Bundle bundle =getIntent().getExtras();
-        mSource = (Uri) bundle.get("imageUri");
-        try {
-            //tempBitmap is Immutable bitmap,
-            //cannot be passed to Canvas constructor
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            tempBitmap = BitmapFactory.decodeStream(
-                    getContentResolver().openInputStream(mSource),null,options);
-            if(options.outHeight>2560 || options.outWidth>1440) {
-                options.inSampleSize = 2;
-            }
-            else options.inSampleSize = 1;
-            options.inJustDecodeBounds = false;
-            tempBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(mSource),null,options);
 
-            Bitmap.Config config;
-            if (tempBitmap.getConfig() != null) {
-                config = tempBitmap.getConfig();
-            } else {
-                config = Bitmap.Config.ARGB_8888;
-            }
-
-            //mBitmap is Mutable bitmap
-            mBitmap = Bitmap.createBitmap(
-                    tempBitmap.getWidth(),
-                    tempBitmap.getHeight(),
-                    config);
-
-            mCanvasMaster = new Canvas(mBitmap);
-            mCanvasMaster.drawBitmap(tempBitmap, 0, 0, null);
-
-            mImageView.setImageBitmap(mBitmap);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-*/
     private void openBitmapReduced(){
         Bundle bundle =getIntent().getExtras();
         mSource = (Uri) bundle.get("imageUri");
@@ -448,7 +405,7 @@ public class DrawingActivity extends AppCompatActivity {
 
             mCanvasMaster = new Canvas(mBitmap);
             mCanvasMaster.drawBitmap(tempBitmap, 0, 0, null);
-            mInitialImage = mBitmap;
+
             mImageView.setImageBitmap(mBitmap);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
@@ -477,6 +434,8 @@ public class DrawingActivity extends AppCompatActivity {
         mCanvasMaster = new Canvas(mBitmap);
         mCanvasMaster.drawBitmap(tempBitmap, 0, 0, null);
         mImageView.setImageBitmap(mBitmap);
+        drawOnProjectedBitMap();
+
     }
     private void convertBitmapToByte(Bitmap bm) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -487,28 +446,7 @@ public class DrawingActivity extends AppCompatActivity {
         intent.putExtra("imageBytes",bytes);
         startActivity(intent);
     }
-    public static int calculateInSampleSize( //algorithm recommended by official documentation to calculate InSampleSize, use if needed
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
     private void openAlertDialog(){
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override

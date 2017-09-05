@@ -2,12 +2,14 @@ package com.pandian.samuvel.imagedrawtuto;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 
@@ -15,6 +17,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
 public class CropActivity extends AppCompatActivity {
     private Button mCropImageButton;
@@ -40,7 +43,7 @@ public class CropActivity extends AppCompatActivity {
         });
 
     }
-    private void loadImage(){
+  /*  private void loadImage(){
         Bundle bundle = getIntent().getExtras();
         byte[] imageBytes = bundle.getByteArray("imageBytesCrop");
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -49,11 +52,25 @@ public class CropActivity extends AppCompatActivity {
         mBitmap.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream);
         mBitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
         mCropImageView.setImageBitmap(mBitmap);//setting image to cropping image view
+    }*/
+    private void loadImage(){
+
+        SharedPreferences sharedPreferences = getSharedPreferences("OriginalImage",MODE_PRIVATE);
+        String decodeImage = sharedPreferences.getString("OriginalImage",null);
+
+        byte[] imageBytes = Base64.decode(decodeImage,Base64.DEFAULT);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        mBitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+        imageBytes = new byte[imageBytes.length];
+        mBitmap.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream);
+        mBitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        mCropImageView.setImageBitmap(mBitmap);//setting image to cropping image view
     }
+
     private void sendCroppedImage(){
         mBitmap = mCropImageView.getCroppedImage();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        mBitmap.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream);
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         Intent intent = new Intent(CropActivity.this,DrawingActivity.class);
         intent.putExtra("imageBytesCropped", imageBytes);

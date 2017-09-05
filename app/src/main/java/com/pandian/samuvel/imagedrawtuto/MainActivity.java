@@ -1,18 +1,22 @@
 package com.pandian.samuvel.imagedrawtuto;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
 
@@ -70,6 +74,18 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode){
                 case REQ_IMAGE:
                     Uri imageUri = data.getData();
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        saveImageInPreference(bitmap,imageUri);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     Intent intent = new Intent(this,DrawingActivity.class);
                     intent.putExtra("imageUri",imageUri);
                     startActivity(intent);
@@ -77,12 +93,35 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void saveImageInPreference(Bitmap bitmap,Uri mSource) throws FileNotFoundException {
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        bitmap = BitmapFactory.decodeStream(
+                getContentResolver().openInputStream(mSource),null,options);
+        if(options.outHeight>2560 || options.outWidth>1440) {
+            options.inSampleSize = 4;
+        }
+        else options.inSampleSize = 1;
+        options.inJustDecodeBounds = false;
+        bitmap = BitmapFactory.decodeStream(
+                getContentResolver().openInputStream(mSource),null,options);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,15,byteArrayOutputStream);
+        byte[] originalImageBytes = byteArrayOutputStream.toByteArray();
+        String encodedImage = Base64.encodeToString(originalImageBytes,Base64.DEFAULT);
+        SharedPreferences sharedPreferences = getSharedPreferences("OriginalImage",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("OriginalImage",encodedImage);
+        editor.apply();
+    }
     private void loadImage(){
         Bundle bundle = getIntent().getExtras();
         byte[] bytes = bundle.getByteArray("imageBytes");
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
         mBitmap = bitmap;
         resultImageView.setImageBitmap(bitmap);
+
     }
     private void saveBitmap(Bitmap bm) {
         ContentValues values = new ContentValues();
